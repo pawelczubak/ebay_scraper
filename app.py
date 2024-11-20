@@ -1,3 +1,5 @@
+import csv
+import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.service import Service as FirefoxService
@@ -42,14 +44,26 @@ def scrape_ebay(query):
         driver.quit()
 
 
-if __name__ == "__main__":
-    search_query = "vw golf 2016 mirror glass"
-    data = scrape_ebay(search_query)
+def read_queries_from_csv(file_path):
+    with open(file_path, "r", encoding="utf-8") as file:
+        csv_reader = csv.DictReader(file)
+        queries = [row["ebay_query"] for row in csv_reader]
+    return queries
 
-    for entry in data:
-        print(
-            f"Position: {entry['position']},"
-            f"Title: {entry['title']},"
-            f"Seller: {entry['seller']},"
-            f"Price: {entry['price']}"
-        )
+if __name__ == "__main__":
+    csv_file_path = "queries.csv"
+    search_terms = read_queries_from_csv(csv_file_path)
+
+    for term in search_terms:
+        print(f"Scraping result for query: {term}")
+
+
+        data = scrape_ebay(term)
+        for entry in data:
+            print(
+                f"Position: {entry['position']},"
+                f"Title: {entry['title']},"
+                f"Seller: {entry['seller']},"
+                f"Price: {entry['price']}"
+            )
+            time.sleep(5)
