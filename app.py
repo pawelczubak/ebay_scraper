@@ -1,5 +1,6 @@
 import csv
 import time
+import random
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.service import Service as FirefoxService
@@ -80,7 +81,7 @@ if __name__ == "__main__":
                 f"Seller: {entry['seller']}, "
                 f"Price: {entry['price']}"
             )
-        time.sleep(5)
+        time.sleep(random.uniform(3, 6))
 
     save_results_to_csv(all_results, output_file_path)
     print(f"Results saved to {output_file_path}")
