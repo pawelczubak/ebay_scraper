@@ -21,13 +21,14 @@ def scrape_ebay(query):
 
         results = []
         listing_position = 1
-        for item in items[:20]:
+        for item in items[:22]:
             try:
                 title = item.find_element(By.CSS_SELECTOR, ".s-item__title").text
-                seller = item.find_element(By.CSS_SELECTOR, ".s-item__seller-info-text").text
+                seller = item.find_element(By.CSS_SELECTOR, ".s-item__seller-info-text").text.split("(")[0].strip()
                 price = item.find_element(By.CSS_SELECTOR, ".s-item__price").text
 
                 results.append({
+                    "query": query,
                     "position": listing_position,
                     "title": title,
                     "seller": seller,
@@ -50,20 +51,36 @@ def read_queries_from_csv(file_path):
         queries = [row["ebay_query"] for row in csv_reader]
     return queries
 
+
+def save_results_to_csv(results, output_file):
+    with open(output_file, "w", encoding="utf-8", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=["query", "position", "seller", "price", "title"])
+        writer.writeheader()
+        writer.writerows(results)
+
+
 if __name__ == "__main__":
     csv_file_path = "queries.csv"
+    output_file_path = "results.csv"  # Plik wyjściowy
     search_terms = read_queries_from_csv(csv_file_path)
+
+    all_results = []
 
     for term in search_terms:
         print(f"Scraping result for query: {term}")
 
-
         data = scrape_ebay(term)
+
+        all_results.extend(data)
+
         for entry in data:
             print(
-                f"Position: {entry['position']},"
-                f"Title: {entry['title']},"
-                f"Seller: {entry['seller']},"
+                f"Position: {entry['position']}, "
+                f"Title: {entry['title']}, "
+                f"Seller: {entry['seller']}, "
                 f"Price: {entry['price']}"
             )
-            time.sleep(5)
+        time.sleep(5)
+
+    save_results_to_csv(all_results, output_file_path)
+    print(f"Results saved to {output_file_path}")
