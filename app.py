@@ -18,6 +18,7 @@ def scrape_ebay(query):
         items = driver.find_elements(By.CSS_SELECTOR, ".s-item")
 
         results = []
+        listing_position = 1
         for item in items[:20]:
             try:
                 title = item.find_element(By.CSS_SELECTOR, ".s-item__title").text
@@ -25,11 +26,13 @@ def scrape_ebay(query):
                 price = item.find_element(By.CSS_SELECTOR, ".s-item__price").text
 
                 results.append({
+                    "position": listing_position,
                     "title": title,
                     "seller": seller,
                     "price": price
                 })
 
+                listing_position += 1
             except Exception as e:
                 continue
 
@@ -45,6 +48,7 @@ if __name__ == "__main__":
 
     for entry in data:
         print(
+            f"Position: {entry['position']},"
             f"Title: {entry['title']},"
             f"Seller: {entry['seller']},"
             f"Price: {entry['price']}"
